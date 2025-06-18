@@ -4,11 +4,14 @@ import {
   ArrayMinSize,
   ArrayUnique,
   IsArray,
-  IsDateString,
+  IsDate,
   IsNotEmpty,
   IsString,
-  MinDate,
+  Validate,
   ValidateNested,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 
 export class CreatePostDto {
@@ -31,12 +34,39 @@ export class CreatePostDto {
   task: CreateTaskDto[];
 }
 
+@ValidatorConstraint({ name: 'isFutureDate', async: false })
+export class IsGreater implements ValidatorConstraintInterface {
+  validate(date: Date, args: ValidationArguments) {
+    return date.getTime() > Date.now();
+  }
+  defaultMessage(args?: ValidationArguments): string {
+    return 'Start date must be in future!';
+  }
+}
+
+@ValidatorConstraint({ name: 'isEndAfterStart', async: false })
+export class IsGreaterThanStart implements ValidatorConstraintInterface {
+  validate(end: Date, args: ValidationArguments) {
+    const obj = args.object as any;
+    return obj.start && end > obj.start;
+  }
+  defaultMessage(args: ValidationArguments) {
+    return 'End date must be after start date';
+  }
+}
+
 export class CreateTaskDto {
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @MinDate(new Date())
+  @Type(() => Date)
+  @IsDate()
+  @Validate(IsGreater)
   start: Date;
-  //   end: Date;
+
+  @Type(() => Date)
+  @IsDate()
+  @Validate(IsGreaterThanStart)
+  end: Date;
 }

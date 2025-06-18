@@ -11,12 +11,12 @@ export class TaskService {
         {
           title: 'gym',
           start: new Date(),
-          //   end: Date.now() + 60,
+          end: new Date(new Date().getTime() + 60 * 60 * 1000),
         },
         {
           title: 'class',
           start: new Date(),
-          //   end: Date.now() + 60,
+          end: new Date(new Date().getTime() + 60 * 60 * 1000),
         },
       ],
     },
