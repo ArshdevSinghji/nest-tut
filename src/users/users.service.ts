@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { IUser } from './interfaces/user.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -9,46 +10,43 @@ export class UsersService {
       name: 'Leanne Graham',
       email: 'Sincere@april.biz',
       role: 'INTERN',
-    },
-    {
-      id: 2,
-      name: 'Ervin Howell',
-      email: 'Shanna@melissa.tv',
-      role: 'INTERN',
-    },
-    {
-      id: 3,
-      name: 'Clementine Bauch',
-      email: 'Nathan@yesenia.net',
-      role: 'ENGINEER',
-    },
-    {
-      id: 4,
-      name: 'Patricia Lebsack',
-      email: 'Julianne.OConner@kory.org',
-      role: 'ENGINEER',
-    },
-    {
-      id: 5,
-      name: 'Chelsey Dietrich',
-      email: 'Lucio_Hettinger@annie.ca',
-      role: 'ADMIN',
+      address: {
+        permanentAddress: 'MG Road',
+        currentAddress: 'Jalandhar',
+        pincode: 144411,
+      },
+      phoneNumber: [1203456789, 1023456789],
+      age: 20,
+      education: {
+        Board: {
+          tenth: 89,
+          twelfth: 89,
+        },
+        university: {
+          name: 'LPU',
+          CGPA: 8.2,
+        },
+      },
     },
   ];
 
   findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
     if (role) {
-      return this.users.filter((user) => user.role === role);
+      const userArr = this.users.filter((user) => user.role === role);
+      if (userArr.length === 0)
+        throw new NotFoundException(`no user with role: ${role}`);
+      return userArr;
     }
     return this.users;
   }
 
   findOne(id: number) {
     const user = this.users.find((user) => user.id === id);
+    if (!user) throw new NotFoundException('User not found!');
     return user;
   }
 
-  create(user: IUser) {
+  create(user: CreateUserDto) {
     const usersByHighestId = [...this.users].sort((a, b) => b.id - a.id);
     if (!(user.email && user.name && user.role)) return;
 
@@ -57,13 +55,17 @@ export class UsersService {
       name: user.name,
       email: user.email,
       role: user.role,
+      address: user.address,
+      phoneNumber: user.phoneNumber,
+      age: user.age,
+      education: user.education,
     };
 
     this.users.push(newUser);
     return newUser;
   }
 
-  update(id: number, updatedUser: IUser) {
+  update(id: number, updatedUser: UpdateUserDto) {
     this.users = this.users.map((user) => {
       if (user.id === id) {
         return { ...user, ...updatedUser };
@@ -79,4 +81,13 @@ export class UsersService {
     this.users = this.users.filter((user) => user.id !== id);
     return removedUser;
   }
+
+  // upsert(id: number, updatedUser: UpdateUserDto) {
+  //   const ifExsist = this.users.findIndex((user) => user.id === id);
+  //   if (ifExsist !== -1) {
+  //     return this.create(updatedUser);
+  //   } else {
+  //     return this.update(id, updatedUser);
+  //   }
+  // }
 }
