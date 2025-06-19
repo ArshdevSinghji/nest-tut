@@ -6,7 +6,6 @@ import { Todo } from 'src/todo/interface/todo.interface';
 @Injectable({ scope: Scope.TRANSIENT })
 export class RepoService {
   private schema: (Post | Product | Todo)[] = [];
-
   findAll() {
     return this.schema;
   }

@@ -30,13 +30,13 @@ export function LogClassExecutionTime(): ClassDecorator {
   return function (target: any) {
     const service = target;
 
-    const startTime = new Date().toLocaleTimeString();
     service.prototype.onModuleInit = function () {
+      const startTime = new Date().toLocaleTimeString();
       Logger.log(`${service.name} class initialized at: ${startTime}`);
     };
 
-    const endTime = new Date().toLocaleTimeString();
     service.prototype.onModuleDestroy = function () {
+      const endTime = new Date().toLocaleTimeString();
       Logger.log(`${service.name} class destroyed at: ${endTime}`);
     };
 
