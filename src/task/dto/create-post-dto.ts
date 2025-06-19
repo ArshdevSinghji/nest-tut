@@ -34,23 +34,23 @@ export class CreatePostDto {
   task: CreateTaskDto[];
 }
 
-@ValidatorConstraint({ name: 'isFutureDate', async: false })
+@ValidatorConstraint()
 export class IsGreater implements ValidatorConstraintInterface {
-  validate(date: Date, args: ValidationArguments) {
+  validate(date: Date) {
     return date.getTime() > Date.now();
   }
-  defaultMessage(args?: ValidationArguments): string {
+  defaultMessage(): string {
     return 'Start date must be in future!';
   }
 }
 
-@ValidatorConstraint({ name: 'isEndAfterStart', async: false })
+@ValidatorConstraint()
 export class IsGreaterThanStart implements ValidatorConstraintInterface {
   validate(end: Date, args: ValidationArguments) {
     const obj = args.object as any;
     return obj.start && end > obj.start;
   }
-  defaultMessage(args: ValidationArguments) {
+  defaultMessage() {
     return 'End date must be after start date';
   }
 }

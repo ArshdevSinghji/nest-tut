@@ -1,8 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post-dto';
+import { CreatePostDto, CreateTaskDto } from './dto/create-post-dto';
+import {
+  LogClassExecutionTime,
+  LogExecutionTime,
+} from 'src/decorators/log-execution-time.decorator';
 
 @Injectable()
+@LogClassExecutionTime()
 export class TaskService {
+  // onModuleInit() {
+  //   Logger.log(
+  //     `${TaskService.name} class initialized at: ${new Date().toLocaleTimeString()}`,
+  //   );
+  // }
+
   private post = [
     {
       postTitle: 'This is Life...',
@@ -22,7 +33,14 @@ export class TaskService {
     },
   ];
 
-  create(post: CreatePostDto) {
+  @LogExecutionTime()
+  async create(post: CreatePostDto): Promise<{
+    postTitle: string;
+    desc: string;
+    task: CreateTaskDto[];
+  }> {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     const newPost = {
       postTitle: post.postTitle,
       desc: post.desc,
