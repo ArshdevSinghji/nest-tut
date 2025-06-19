@@ -31,22 +31,15 @@ export function LogClassExecutionTime(): ClassDecorator {
     const service = target;
 
     const startTime = new Date().toLocaleTimeString();
-    const newConstructor: any = function (...args: any[]) {
+    service.prototype.onModuleInit = function () {
       Logger.log(`${service.name} class initialized at: ${startTime}`);
-      return new service(...args);
     };
 
-    newConstructor.prototype = service.prototype;
-
     const endTime = new Date().toLocaleTimeString();
-    if (!newConstructor.prototype.onModuleDestroy) {
-      newConstructor.prototype.onModuleDestroy = function () {
-        Logger.log(`${service.name} class destroyed at: ${endTime}`);
-      };
-    }
+    service.prototype.onModuleDestroy = function () {
+      Logger.log(`${service.name} class destroyed at: ${endTime}`);
+    };
 
-    Injectable()(newConstructor);
-
-    return newConstructor;
+    return service;
   };
 }
