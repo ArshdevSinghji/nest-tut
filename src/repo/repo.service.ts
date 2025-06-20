@@ -1,11 +1,8 @@
 import { Injectable, Scope } from '@nestjs/common';
-import { Post } from 'src/post/interface/post.interface';
-import { Product } from 'src/product/interface/product.interface';
-import { Todo } from 'src/todo/interface/todo.interface';
 
 @Injectable({ scope: Scope.TRANSIENT })
-export class RepoService {
-  private schema: (Post | Product | Todo)[] = [];
+export class RepoService<T extends { id: number }> {
+  private schema: T[] = [];
   findAll() {
     return this.schema;
   }
@@ -15,12 +12,12 @@ export class RepoService {
     return item;
   }
 
-  create(body) {
+  create(body: T) {
     this.schema.push(body);
     return body;
   }
 
-  update(id: number, body) {
+  update(id: number, body: T) {
     const index = this.schema.findIndex((i) => i.id === id);
     if (index !== -1) {
       this.schema[index] = { ...this.schema[index], ...body };
@@ -29,7 +26,7 @@ export class RepoService {
     return null;
   }
 
-  upsert(id: number | undefined, body) {
+  upsert(id: number | undefined, body: T) {
     if (id && this.findOne(id)) {
       return this.update(id, body);
     }
